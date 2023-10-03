@@ -31,6 +31,19 @@ function findLetterIndexes(word, letter) {
   return indexes;
 }
 
+function validateUserLetter(letter, guessedLetters) {
+  if (letter.length !== 1) {
+    return "Please, input a single letter.";
+  }
+  if (!/[a-z]/.test(letter)) {
+    return "Please, enter a lowercase letter from the English alphabet.";
+  }
+  if (guessedLetters.includes(letter)) {
+    return "You've already guessed this letter.";
+  }
+  return "";
+}
+
 function runGame(attempts) {
   const correctWord = getRandomWord();
   let blurredWord = blurWord(correctWord);
@@ -40,19 +53,20 @@ function runGame(attempts) {
   do {
     console.log(blurredWord);
     const letter = input(`Input a letter: `);
+    
+    const validationErrorMsg = validateUserLetter(letter, guessedLetters);
+    if (validationErrorMsg) {
+      console.log(validationErrorMsg + "\n");
+      continue;
+    }
 
     const letterIndexes = findLetterIndexes(correctWord, letter);
     if (letterIndexes.length > 0) {
-      if (guessedLetters.some(l => l === letter)) {
-        console.log("No improvements.");
-        attempts--;
-      } else {
         blurredWord = uncoverLetters(blurredWord, letterIndexes, letter);
-        if (blurredWord.indexOf("-") === -1) {
+        if (!blurredWord.includes("-")) {
           win = true;
           break;
         }
-      }
     } else {
       console.log("That letter doesn't appear in the word.");
       attempts--;
@@ -63,8 +77,7 @@ function runGame(attempts) {
   } while (attempts > 0);
 
   if (win) {
-    console.log("\n" + correctWord);
-    console.log("You guessed the word!");
+    console.log(`\nYou guessed the word ${correctWord}!`);
     console.log("You survived!");
   } else {
     console.log("You lost!");
