@@ -48,15 +48,14 @@ function runGame(attempts) {
   const correctWord = getRandomWord();
   let blurredWord = blurWord(correctWord);
   const guessedLetters = [];
-  let win = false;
 
   do {
-    console.log(blurredWord);
+    console.log("\n" + blurredWord);
     const letter = input(`Input a letter: `);
     
     const validationErrorMsg = validateUserLetter(letter, guessedLetters);
     if (validationErrorMsg) {
-      console.log(validationErrorMsg + "\n");
+      console.log(validationErrorMsg);
       continue;
     }
 
@@ -64,31 +63,45 @@ function runGame(attempts) {
     if (letterIndexes.length > 0) {
         blurredWord = uncoverLetters(blurredWord, letterIndexes, letter);
         if (!blurredWord.includes("-")) {
-          win = true;
-          break;
+          console.log(`\nYou guessed the word ${correctWord}!`);
+          console.log("You survived!");
+          return 1;
         }
     } else {
       console.log("That letter doesn't appear in the word.");
       attempts--;
     }
     guessedLetters.push(letter);
-
-    console.log();
   } while (attempts > 0);
 
-  if (win) {
-    console.log(`\nYou guessed the word ${correctWord}!`);
-    console.log("You survived!");
-  } else {
-    console.log("You lost!");
-  }
+  console.log("You lost!");
+  return -1;
 }
 
 function main() {
-  console.log("H A N G M A N\n");
-  let attempts = 8;
+  let wins = 0;
+  let loses = 0;
 
-  runGame(attempts);
+  console.log("H A N G M A N");
+
+  do {
+    let userChoice = input('Type "play" to play the game, "results" to show the scoreboard, and "exit" to quit: ');
+    if (userChoice === "exit") {
+      break;
+    }
+    if (userChoice === "play") {
+      let attempts = 8;
+      const result = runGame(attempts);
+      if (result === 1) {
+        wins++;
+      } else {
+        loses++;
+      }
+    } else if (userChoice === "results") {
+      console.log(`You won: ${wins} times.`);
+      console.log(`You lost: ${loses} times.`);
+    }
+  } while (true);
 }
 
 main();
