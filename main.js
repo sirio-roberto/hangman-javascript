@@ -9,20 +9,11 @@ function getRandomWord() {
   const index = Math.floor(Math.random() * possibleWords.length);
   return possibleWords[index];
 }
-
-function validateUserGuess(userGuess, correctWord) {
-  if (userGuess === correctWord) {
-    console.log("You survived!");
-  } else {
-    console.log("You lost!");
-  }
-}
-
 function blurWord(word) {
   return "-".repeat(word.length);
 }
 function uncoverLetters(blurredWord, letterIndexes, letter) {
-  const blurArray = Array.from(blurredWord);
+  const blurArray =  [...blurredWord];
   letterIndexes.forEach(i => blurArray[i] = letter);
   return blurArray.join("");
 }
@@ -43,6 +34,8 @@ function findLetterIndexes(word, letter) {
 function runGame(attempts) {
   const correctWord = getRandomWord();
   let blurredWord = blurWord(correctWord);
+  const guessedLetters = [];
+  let win = false;
 
   do {
     console.log(blurredWord);
@@ -50,14 +43,32 @@ function runGame(attempts) {
 
     const letterIndexes = findLetterIndexes(correctWord, letter);
     if (letterIndexes.length > 0) {
-      blurredWord = uncoverLetters(blurredWord, letterIndexes, letter);
+      if (guessedLetters.some(l => l === letter)) {
+        console.log("No improvements.");
+        attempts--;
+      } else {
+        blurredWord = uncoverLetters(blurredWord, letterIndexes, letter);
+        if (blurredWord.indexOf("-") === -1) {
+          win = true;
+          break;
+        }
+      }
     } else {
       console.log("That letter doesn't appear in the word.");
+      attempts--;
     }
+    guessedLetters.push(letter);
 
     console.log();
-    attempts--;
   } while (attempts > 0);
+
+  if (win) {
+    console.log("\n" + correctWord);
+    console.log("You guessed the word!");
+    console.log("You survived!");
+  } else {
+    console.log("You lost!");
+  }
 }
 
 function main() {
@@ -65,8 +76,6 @@ function main() {
   let attempts = 8;
 
   runGame(attempts);
-
-  console.log("Thanks for playing!");
 }
 
 main();
